@@ -105,7 +105,7 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
             onClick={onClose}
             className="w-full bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg font-medium transition-colors"
           >
-            Ok, i got it
+            Ok, I got it
           </button>
         </div>
       </div>

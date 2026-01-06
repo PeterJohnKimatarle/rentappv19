@@ -88,13 +88,16 @@ export default function AppInfoModal({ isOpen, onClose }: AppInfoModalProps) {
               <p className="text-sm text-purple-800">
                 <strong>Release:</strong> Stable<br/>
                 <strong>Platform:</strong> Progressive Web App<br/>
-                <strong>Optimized for speed and reliability</strong>
+                Optimized for speed and reliability
               </p>
             </div>
 
             {/* Support */}
             <div className="bg-yellow-50 rounded-lg p-4 border-l-4 border-yellow-400">
-              <h4 className="font-semibold text-yellow-900 mb-2">Help & Support</h4>
+              <div className="flex items-center space-x-2 mb-2">
+                <Info className="text-yellow-600" size={20} />
+                <h4 className="font-semibold text-yellow-900">Help & Support</h4>
+              </div>
               <p className="text-sm text-yellow-800 mb-2">
                 If you encounter any issues with the app, try refreshing or reinstalling.
               </p>
@@ -111,10 +114,11 @@ export default function AppInfoModal({ isOpen, onClose }: AppInfoModalProps) {
               <p className="text-sm text-gray-500 mt-2">
                 Built for renters, brokers, and owners.
               </p>
-              <div className="flex justify-center gap-4 mt-4">
+              <div className="flex justify-center items-center gap-2 mt-4">
                 <a href="#" className="text-sm text-blue-600 hover:text-blue-800 underline">
                   Privacy Policy
                 </a>
+                <span className="text-sm text-gray-400">|</span>
                 <a href="#" className="text-sm text-blue-600 hover:text-blue-800 underline">
                   Terms & Conditions
                 </a>
@@ -129,7 +133,7 @@ export default function AppInfoModal({ isOpen, onClose }: AppInfoModalProps) {
             onClick={onClose}
             className="w-full bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg font-medium transition-colors"
           >
-            Ok, i got it
+            Ok, I got it
           </button>
         </div>
       </div>
