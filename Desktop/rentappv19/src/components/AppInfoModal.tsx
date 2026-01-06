@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Smartphone, Info, Star, Shield, Zap, Heart } from 'lucide-react';
+import { Smartphone, Info, Star, Shield, Zap, Heart } from 'lucide-react';
 import { usePreventScroll } from '@/hooks/usePreventScroll';
 
 interface AppInfoModalProps {
@@ -31,17 +31,11 @@ export default function AppInfoModal({ isOpen, onClose }: AppInfoModalProps) {
         className="bg-white rounded-xl max-w-md w-full max-h-[80vh] overflow-hidden flex flex-col relative z-[70]"
       >
         {/* Header */}
-        <div className="flex items-center justify-center pt-4 pb-3 px-4 bg-white sticky top-0 z-10 border-b border-gray-200">
+        <div className="flex items-center justify-center pt-3 pb-2 px-4 bg-white sticky top-0 z-10 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <Smartphone className="text-blue-500" size={24} />
-            <h3 className="text-xl font-semibold text-black">Rentapp Info</h3>
+            <h3 className="text-xl font-semibold text-black">App info</h3>
           </div>
-          <button
-            onClick={onClose}
-            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X size={24} />
-          </button>
         </div>
 
         {/* Content */}
@@ -128,12 +122,12 @@ export default function AppInfoModal({ isOpen, onClose }: AppInfoModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-gray-50 border-t border-gray-200 flex justify-center">
+        <div className="p-3 bg-gray-50 border-t border-gray-200">
           <button
             onClick={onClose}
-            className="w-2/3 px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-lg font-medium transition-colors"
+            className="w-full bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg font-medium transition-colors"
           >
-            Got it!
+            Ok, i got it
           </button>
         </div>
       </div>

@@ -31,7 +31,7 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
         className="bg-white rounded-xl max-w-md w-full max-h-[80vh] overflow-hidden flex flex-col relative z-[70]"
       >
         {/* Header */}
-        <div className="flex items-center justify-center pt-4 pb-3 px-4 bg-white sticky top-0 z-10 border-b border-gray-200">
+        <div className="flex items-center justify-center pt-3 pb-2 px-4 bg-white sticky top-0 z-10 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <Smartphone className="text-blue-500" size={24} />
             <h3 className="text-xl font-semibold text-black">Install Rentapp</h3>
@@ -104,7 +104,7 @@ export default function InstallInstructionsModal({ isOpen, onClose }: InstallIns
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-gray-50 border-t border-gray-200">
+        <div className="p-3 bg-gray-50 border-t border-gray-200">
           <button
             onClick={onClose}
             className="w-full bg-gray-300 hover:bg-gray-400 text-gray-700 py-3 rounded-lg font-medium transition-colors"
