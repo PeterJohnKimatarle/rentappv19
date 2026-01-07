@@ -861,15 +861,15 @@ export default function PropertyDetailsPage() {
                                 }
                               }
                             }}
-                            className="ml-1 relative inline-block"
+                            className="ml-1 relative inline-flex items-center gap-1"
                           >
+                            {property.ownerName}{'uploaderType' in property && property.uploaderType ? ` (${property.uploaderType})` : ''}
                             {((user?.role === 'admin' || (user?.role === 'staff' && user?.isApproved)) && 'ownerId' in property && property.ownerId && typeof window !== 'undefined') && (() => {
                               const notes = getUserNotes(property.ownerId);
                               return notes.trim().length > 0;
                             })() && (
-                              <span className="absolute -left-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#fbbf24' }}></span>
+                              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#fbbf24' }}></span>
                             )}
-                            {property.ownerName}{'uploaderType' in property && property.uploaderType ? ` (${property.uploaderType})` : ''}
                           </button>
                         </div>
                       )}
@@ -2187,7 +2187,7 @@ export default function PropertyDetailsPage() {
                     setShowUserNotesModal(true);
                   }
                 }}
-                className="w-full px-4 py-3 rounded-lg font-medium text-white transition-colors relative"
+                className="w-full px-4 py-3 rounded-lg font-medium text-white transition-colors relative flex items-center justify-center gap-2"
                 style={{ 
                   backgroundColor: 'rgba(59, 130, 246, 0.9)',
                   WebkitTapHighlightColor: 'transparent',
@@ -2199,9 +2199,9 @@ export default function PropertyDetailsPage() {
                 }}
               >
                 {hasUserNotes && (
-                  <span className="absolute left-2 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#fbbf24' }}></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#fbbf24' }}></span>
                 )}
-                User notes (Behaviour)
+                <span>User notes (Behaviour)</span>
               </button>
             </div>
           </div>
