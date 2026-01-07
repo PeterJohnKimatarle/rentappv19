@@ -2153,11 +2153,20 @@ export default function PropertyDetailsPage() {
                     const notes = getUserNotes(uploaderUser.id);
                     setUserNotes(notes);
                     setIsUserNotesEditable(false);
-                    setShowUploaderProfileModal(false);
+                    // Don't close the uploader profile modal
                     setShowUserNotesModal(true);
                   }
                 }}
-                className="w-full px-4 py-3 rounded-lg font-medium bg-gray-300 hover:bg-gray-400 text-gray-700 transition-colors"
+                className="w-full px-4 py-3 rounded-lg font-medium text-white transition-colors"
+                style={{ 
+                  backgroundColor: 'rgba(59, 130, 246, 0.9)',
+                  WebkitTapHighlightColor: 'transparent',
+                  WebkitUserSelect: 'none',
+                  MozUserSelect: 'none',
+                  msUserSelect: 'none',
+                  userSelect: 'none',
+                  outline: 'none'
+                }}
               >
                 User notes (Behaviour)
               </button>
@@ -2179,6 +2188,10 @@ export default function PropertyDetailsPage() {
           onClick={() => {
             setShowUserNotesModal(false);
             setUserNotes('');
+            // Reopen uploader profile modal
+            if (uploaderUser) {
+              setShowUploaderProfileModal(true);
+            }
           }}
         >
           <div
@@ -2250,6 +2263,10 @@ export default function PropertyDetailsPage() {
                   }
                   setIsUserNotesEditable(false);
                   setShowUserNotesModal(false);
+                  // Reopen uploader profile modal
+                  if (uploaderUser) {
+                    setShowUploaderProfileModal(true);
+                  }
                 }}
                 className="flex-1 px-4 py-2 rounded-lg font-medium text-white select-none"
                 style={{ 
@@ -2269,6 +2286,10 @@ export default function PropertyDetailsPage() {
                   setIsUserNotesEditable(false);
                   setShowUserNotesModal(false);
                   setUserNotes('');
+                  // Reopen uploader profile modal
+                  if (uploaderUser) {
+                    setShowUploaderProfileModal(true);
+                  }
                 }}
                 className="px-4 py-2 rounded-lg font-medium text-white select-none flex-1"
                 style={{ 
