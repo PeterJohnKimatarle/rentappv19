@@ -171,7 +171,25 @@ export default function PropertyCard({ property, onBookmarkClick, showMinusIcon 
   const userId = user?.id;
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isPinged, setIsPinged] = useState(false);
+  // Initialize states immediately to prevent flash
+  const [isClosed, setIsClosed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    // If showClosedButton prop is true, property is definitely closed
+    if (showClosedButton) return true;
+    // Otherwise check the actual status
+    return isPropertyClosedAnyUser(property.id);
+  });
+  
+  const [isPinged, setIsPinged] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    // Don't check follow-up if property is closed (closed takes precedence)
+    if (showClosedButton || isPropertyClosedAnyUser(property.id)) return false;
+    // If showNotesButton prop is true, property is definitely in follow-up
+    if (showNotesButton) return true;
+    // Otherwise check the actual status
+    return isPropertyInFollowUpAnyUser(property.id);
+  });
+  
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [previewImageIndex, setPreviewImageIndex] = useState(0);
@@ -198,7 +216,6 @@ export default function PropertyCard({ property, onBookmarkClick, showMinusIcon 
   const [notes, setNotes] = useState('');
   const [hasNotes, setHasNotes] = useState(false);
   const [isNotesEditable, setIsNotesEditable] = useState(false);
-  const [isClosed, setIsClosed] = useState(false);
   const [bookingModalType, setBookingModalType] = useState<'book' | 'status'>('book');
   const [pendingStatus, setPendingStatus] = useState<'available' | 'occupied' | ''>(property.status);
   const [pendingImages, setPendingImages] = useState(false);
