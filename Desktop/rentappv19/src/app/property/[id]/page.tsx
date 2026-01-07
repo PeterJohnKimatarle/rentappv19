@@ -785,35 +785,35 @@ export default function PropertyDetailsPage() {
                   {('ownerName' in property && property.ownerName) || ('ownerEmail' in property && property.ownerEmail) ? (
                     <>
                       {'ownerName' in property && property.ownerName && (
-                        <button
-                          onClick={() => {
-                            if ('ownerId' in property && property.ownerId) {
-                              const allUsers = getAllUsers();
-                              const uploader = allUsers.find(u => u.id === property.ownerId);
-                              if (uploader) {
-                                setUploaderUser({
-                                  id: uploader.id,
-                                  name: uploader.name,
-                                  firstName: uploader.firstName,
-                                  lastName: uploader.lastName,
-                                  email: uploader.email,
-                                  phone: uploader.phone,
-                                  role: uploader.role,
-                                  profileImage: uploader.profileImage,
-                                  bio: uploader.bio,
-                                  isApproved: uploader.isApproved
-                                });
-                                setShowUploaderProfileModal(true);
-                              }
-                            }
-                          }}
-                          className="text-lg xl:text-xl text-gray-900 hover:text-blue-600 cursor-pointer text-left w-full"
-                        >
+                        <div className="text-lg xl:text-xl text-gray-900">
                           <span className="font-bold">Uploaded by:</span>{' '}
-                          <span className="text-blue-600 hover:text-blue-800 underline">
+                          <button
+                            onClick={() => {
+                              if ('ownerId' in property && property.ownerId) {
+                                const allUsers = getAllUsers();
+                                const uploader = allUsers.find(u => u.id === property.ownerId);
+                                if (uploader) {
+                                  setUploaderUser({
+                                    id: uploader.id,
+                                    name: uploader.name,
+                                    firstName: uploader.firstName,
+                                    lastName: uploader.lastName,
+                                    email: uploader.email,
+                                    phone: uploader.phone,
+                                    role: uploader.role,
+                                    profileImage: uploader.profileImage,
+                                    bio: uploader.bio,
+                                    isApproved: uploader.isApproved
+                                  });
+                                  setShowUploaderProfileModal(true);
+                                }
+                              }
+                            }}
+                            className="ml-1 underline decoration-black"
+                          >
                             {property.ownerName}{'uploaderType' in property && property.uploaderType ? ` (${property.uploaderType})` : ''}
-                          </span>
-                        </button>
+                          </button>
+                        </div>
                       )}
                       {'ownerEmail' in property && property.ownerEmail && (
                         <div className="text-lg xl:text-xl text-gray-900">
@@ -2084,7 +2084,6 @@ export default function PropertyDetailsPage() {
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Name</label>
                     <div className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg border border-gray-300">
-                      <span className="font-bold">Uploaded by:</span>{' '}
                       {uploaderUser.firstName || uploaderUser.name?.split(' ')[0] || 'Not provided'}
                       {uploaderUser.lastName && ` ${uploaderUser.lastName}`}
                       {!uploaderUser.firstName && !uploaderUser.lastName && uploaderUser.name && ` ${uploaderUser.name.split(' ').slice(1).join(' ')}`}
@@ -2102,24 +2101,6 @@ export default function PropertyDetailsPage() {
                     <label className="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
                     <div className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg border border-gray-300">
                       {uploaderUser.phone || 'Not provided'}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Role</label>
-                    <div className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg border border-gray-300">
-                      {uploaderUser.role === 'tenant' || uploaderUser.role === 'landlord' || uploaderUser.role === 'broker' ? (
-                        <>Member ({uploaderUser.role.charAt(0).toUpperCase() + uploaderUser.role.slice(1)})</>
-                      ) : (
-                        <>
-                          {uploaderUser.role.charAt(0).toUpperCase() + uploaderUser.role.slice(1)}
-                          {uploaderUser.role === 'staff' && uploaderUser.isApproved !== undefined && (
-                            <span className="ml-2 text-sm">
-                              ({uploaderUser.isApproved ? 'Approved' : 'Pending'})
-                            </span>
-                          )}
-                        </>
-                      )}
                     </div>
                   </div>
 
