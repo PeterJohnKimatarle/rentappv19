@@ -58,6 +58,21 @@ export default function PropertyDetailsPage() {
     const foundProperty = allProperties.find(p => p.id === propertyId);
     setProperty(foundProperty || null);
     
+    // Initialize status states immediately to prevent flash
+    if (foundProperty && typeof window !== 'undefined') {
+      // Check closed status first (takes precedence)
+      const closed = isPropertyClosedAnyUser(foundProperty.id);
+      setIsClosed(closed);
+      
+      // Only check follow-up if not closed
+      if (!closed) {
+        const pinged = isPropertyInFollowUpAnyUser(foundProperty.id);
+        setIsPinged(pinged);
+      } else {
+        setIsPinged(false);
+      }
+    }
+    
     // Check for status confirmation
     if (propertyId) {
       const confirmation = getStatusConfirmation(propertyId);
