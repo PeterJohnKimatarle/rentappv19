@@ -2187,7 +2187,7 @@ export default function PropertyDetailsPage() {
                     setShowUserNotesModal(true);
                   }
                 }}
-                className="w-full px-4 py-3 rounded-lg font-medium text-white transition-colors relative flex items-center justify-start gap-2"
+                className="w-full px-4 py-3 rounded-lg font-medium text-white transition-colors relative flex items-center justify-center"
                 style={{ 
                   backgroundColor: 'rgba(59, 130, 246, 0.9)',
                   WebkitTapHighlightColor: 'transparent',
@@ -2199,7 +2199,7 @@ export default function PropertyDetailsPage() {
                 }}
               >
                 {hasUserNotes && (
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#fbbf24' }}></span>
+                  <span className="absolute left-2 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#fbbf24' }}></span>
                 )}
                 <span>User notes (Behaviour)</span>
               </button>
