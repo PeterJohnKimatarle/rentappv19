@@ -171,25 +171,7 @@ export default function PropertyCard({ property, onBookmarkClick, showMinusIcon 
   const userId = user?.id;
   const router = useRouter();
   const searchParams = useSearchParams();
-  // Initialize states immediately to prevent flash
-  const [isClosed, setIsClosed] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    // If showClosedButton prop is true, property is definitely closed
-    if (showClosedButton) return true;
-    // Otherwise check the actual status
-    return isPropertyClosedAnyUser(property.id);
-  });
-  
-  const [isPinged, setIsPinged] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    // Don't check follow-up if property is closed (closed takes precedence)
-    if (showClosedButton || isPropertyClosedAnyUser(property.id)) return false;
-    // If showNotesButton prop is true, property is definitely in follow-up
-    if (showNotesButton) return true;
-    // Otherwise check the actual status
-    return isPropertyInFollowUpAnyUser(property.id);
-  });
-  
+  const [isPinged, setIsPinged] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [previewImageIndex, setPreviewImageIndex] = useState(0);
@@ -210,12 +192,12 @@ export default function PropertyCard({ property, onBookmarkClick, showMinusIcon 
   const [showThreeDotsModal, setShowThreeDotsModal] = useState(false);
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [wasOpenedFromNotesModal, setWasOpenedFromNotesModal] = useState(false);
-  const [wasOpenedFromActionsModal, setWasOpenedFromActionsModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [infoModalMessage, setInfoModalMessage] = useState('');
   const [notes, setNotes] = useState('');
   const [hasNotes, setHasNotes] = useState(false);
   const [isNotesEditable, setIsNotesEditable] = useState(false);
+  const [isClosed, setIsClosed] = useState(false);
   const [bookingModalType, setBookingModalType] = useState<'book' | 'status'>('book');
   const [pendingStatus, setPendingStatus] = useState<'available' | 'occupied' | ''>(property.status);
   const [pendingImages, setPendingImages] = useState(false);
@@ -358,15 +340,13 @@ export default function PropertyCard({ property, onBookmarkClick, showMinusIcon 
 
   // Check if property has notes
   useEffect(() => {
-    // Check notes for all states (Default, Followed, Closed)
-    if (typeof window !== 'undefined') {
+    // Don't check notes if property is closed (closed takes precedence)
+    if (typeof window !== 'undefined' && (showNotesButton || isPinged) && !(showClosedButton || isClosed)) {
       const checkNotes = () => {
         // Only staff/admin can have notes - check shared staff notes
         if (user?.role === 'admin' || (user?.role === 'staff' && user?.isApproved)) {
           const notes = getStaffNotes(property.id);
           setHasNotes(notes.trim().length > 0);
-        } else {
-          setHasNotes(false);
         }
       };
       checkNotes();
@@ -379,8 +359,11 @@ export default function PropertyCard({ property, onBookmarkClick, showMinusIcon 
         window.removeEventListener('storage', checkNotes);
         window.removeEventListener('notesChanged', checkNotes);
       };
+    } else if (showClosedButton || isClosed) {
+      // Clear notes indicator if property is closed
+      setHasNotes(false);
     }
-  }, [property.id, userId, user?.role, user?.isApproved]);
+  }, [property.id, userId, showNotesButton, isPinged, showClosedButton, isClosed, user?.role, user?.isApproved]);
 
   // Detect keyboard visibility and move modal up by 100px when keyboard is visible
   useEffect(() => {
@@ -944,7 +927,7 @@ export default function PropertyCard({ property, onBookmarkClick, showMinusIcon 
               <div className="mt-2 flex items-center" onClick={(e) => e.stopPropagation()}>
                 {/* Status Button - Shows current property status */}
                 <button
-                  className="flex-1 flex items-center justify-center gap-2 text-white px-4 py-2 rounded-lg text-base font-medium select-none relative"
+                  className="flex-1 flex items-center justify-center gap-2 text-white px-4 py-2 rounded-lg text-base font-medium select-none"
                   style={{ 
                     backgroundColor: (showNotesButton || isPinged)
                         ? 'rgba(59, 130, 246, 0.9)' 
@@ -970,10 +953,21 @@ export default function PropertyCard({ property, onBookmarkClick, showMinusIcon 
                     e.stopPropagation();
                     e.preventDefault();
                     markPropertyAsViewed(); // Track property view
-                    // Open property actions modal for all states
+                    // Only open notes modal when in Follow Up (Notes state)
                     if (showNotesButton || isPinged) {
-                      // When followed, open property actions modal instead of notes directly
-                      setShowThreeDotsModal(true);
+                      if (typeof window !== 'undefined') {
+                        // For staff/admin, get shared staff notes; for regular users, get their own
+                        if (user?.role === 'admin' || (user?.role === 'staff' && user?.isApproved)) {
+                          const notes = getStaffNotes(property.id);
+                          setNotes(notes);
+                        } else if (user?.id) {
+                        const key = `rentapp_notes_${user.id}_${property.id}`;
+                        const savedNotes = localStorage.getItem(key) || '';
+                        setNotes(savedNotes);
+                      }
+                      }
+                      setIsNotesEditable(false);
+                      setShowNotesModal(true);
                     } else if (showClosedButton || isClosed) {
                       // Staff and admin can open property actions modal
                       markPropertyAsViewed(); // Track property view
@@ -985,16 +979,18 @@ export default function PropertyCard({ property, onBookmarkClick, showMinusIcon 
                     }
                   }}
                 >
-                  {hasNotes && (
-                    <span className="absolute left-2 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#fbbf24' }}></span>
+                  {(showNotesButton || isPinged) && !(showClosedButton || isClosed) && hasNotes && (
+                    <span className="w-2 h-2 rounded-full flex-shrink-0 -ml-2" style={{ backgroundColor: '#fbbf24' }}></span>
                   )}
                   {(showClosedButton || isClosed) ? (
                     <>
+                      <Check size={18} className="text-white" strokeWidth={3} />
                       <span className="select-none" style={{ WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none', userSelect: 'none' }}>Closed</span>
                     </>
                   ) : (showNotesButton || isPinged) ? (
                     <>
-                      <span className="select-none" style={{ WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none', userSelect: 'none' }}>Followed</span>
+                      <FileText size={18} />
+                      <span className="select-none" style={{ WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none', userSelect: 'none' }}>Notes</span>
                     </>
                   ) : (
                     <>
@@ -1389,11 +1385,6 @@ export default function PropertyCard({ property, onBookmarkClick, showMinusIcon 
           onClick={() => {
             setShowNotesModal(false);
             setNotes('');
-            // Reopen property actions modal if notes was opened from there
-            if (wasOpenedFromActionsModal) {
-              setShowThreeDotsModal(true);
-              setWasOpenedFromActionsModal(false);
-            }
           }}
         >
           <div
@@ -1408,6 +1399,28 @@ export default function PropertyCard({ property, onBookmarkClick, showMinusIcon 
               <h3 className="text-xl font-semibold text-black flex-1 text-center">
                 Follow-up notes
               </h3>
+              {((user?.role === 'staff' && user?.isApproved) || user?.role === 'admin') && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setWasOpenedFromNotesModal(true);
+                    setShowNotesModal(false);
+                    setShowThreeDotsModal(true);
+                  }}
+                  className="absolute top-0 md:top-[60%] md:-translate-y-1/2 right-2 md:right-3 flex items-center justify-center text-gray-700 hover:text-black cursor-pointer select-none hover:bg-black/20 rounded p-1.5 transition-colors"
+                  style={{ 
+                    WebkitTapHighlightColor: 'transparent',
+                    WebkitUserSelect: 'none',
+                    MozUserSelect: 'none',
+                    msUserSelect: 'none',
+                    userSelect: 'none',
+                    outline: 'none'
+                  }}
+                  title="Options"
+                >
+                  <MoreVertical size={24} />
+                </button>
+              )}
             </div>
             
             <textarea
@@ -1473,11 +1486,6 @@ export default function PropertyCard({ property, onBookmarkClick, showMinusIcon 
                   }
                     setIsNotesEditable(false);
                   setShowNotesModal(false);
-                  // Reopen property actions modal if notes was opened from there
-                  if (wasOpenedFromActionsModal) {
-                    setShowThreeDotsModal(true);
-                    setWasOpenedFromActionsModal(false);
-                  }
                 }}
                   className="flex-1 px-4 py-2 rounded-lg font-medium text-white select-none"
                   style={{ 
@@ -1497,11 +1505,6 @@ export default function PropertyCard({ property, onBookmarkClick, showMinusIcon 
                   setIsNotesEditable(false);
                   setShowNotesModal(false);
                   setNotes('');
-                  // Reopen property actions modal if notes was opened from there
-                  if (wasOpenedFromActionsModal) {
-                    setShowThreeDotsModal(true);
-                    setWasOpenedFromActionsModal(false);
-                  }
                 }}
                 className={`px-4 py-2 rounded-lg font-medium text-white select-none ${user?.role === 'admin' ? 'flex-1' : 'flex-1'}`}
                 style={{ 
@@ -1722,47 +1725,31 @@ export default function PropertyCard({ property, onBookmarkClick, showMinusIcon 
                     outline: 'none'
                   }}
                 >
+                  <Check size={18} className="text-white" strokeWidth={3} />
                   <span>Close this property</span>
                 </button>
               )}
-              {((user?.role === 'staff' && user?.isApproved) || user?.role === 'admin') && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowThreeDotsModal(false);
-                    // Load notes for staff/admin
-                    if (typeof window !== 'undefined') {
-                      if (user?.role === 'admin' || (user?.role === 'staff' && user?.isApproved)) {
-                        const notes = getStaffNotes(property.id);
-                        setNotes(notes);
-                      } else if (user?.id) {
-                        const key = `rentapp_notes_${user.id}_${property.id}`;
-                        const savedNotes = localStorage.getItem(key) || '';
-                        setNotes(savedNotes);
-                      }
-                    }
-                    setIsNotesEditable(false);
-                    setWasOpenedFromActionsModal(true);
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowThreeDotsModal(false);
+                  if (wasOpenedFromNotesModal) {
                     setShowNotesModal(true);
-                  }}
-                  className="w-full px-4 py-3 rounded-lg font-medium text-white text-base flex items-center justify-center gap-2 select-none relative"
-                  style={{ 
-                    backgroundColor: 'rgba(107, 114, 128, 0.9)',
-                    WebkitTapHighlightColor: 'transparent',
-                    WebkitUserSelect: 'none',
-                    MozUserSelect: 'none',
-                    msUserSelect: 'none',
-                    userSelect: 'none',
-                    outline: 'none'
-                  }}
-                >
-                  {hasNotes && (
-                    <span className="absolute left-2 w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: '#fbbf24' }}></span>
-                  )}
-                  <FileText size={18} />
-                  <span>View/edit notes</span>
-                </button>
-              )}
+                    setWasOpenedFromNotesModal(false);
+                  }
+                }}
+                className="w-full px-4 py-3 rounded-lg font-medium bg-gray-300 text-gray-700 select-none"
+                style={{ 
+                  WebkitTapHighlightColor: 'transparent',
+                  WebkitUserSelect: 'none',
+                  MozUserSelect: 'none',
+                  msUserSelect: 'none',
+                  userSelect: 'none',
+                  outline: 'none'
+                }}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
